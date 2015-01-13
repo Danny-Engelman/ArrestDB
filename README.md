@@ -96,6 +96,11 @@ Please note that `GET` calls accept the following query string variables:
   - `order` (order direction: `ASC` or `DESC`)
 - `limit` (`LIMIT x` SQL clause)
   - `offset` (`OFFSET x` SQL clause)
+- `where` (`WHERE x` SQL clause)
+  - array of: 
+    - `col` (colum to filter)
+    - `op` (SQL operator (e.g '=', '>=', ...))
+    - `value` (value to filter)
 
 Additionally, `POST` and `PUT` requests accept JSON-encoded and/or zlib-compressed payloads.
 
