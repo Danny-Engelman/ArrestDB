@@ -43,6 +43,9 @@ ArrestDB::Serve('GET', '/(#any)/(#any)/(#any)', function ($table, $id, $data)
 		sprintf('WHERE "%s" %s ?', $id, (ctype_digit($data) === true) ? '=' : 'LIKE'),
 	);
 
+	$countQuery = str_replace('SELECT *', 'SELECT COUNT(*)', sprintf('%s;', implode(' ', $query)));
+	$count = intval(array_shift(array_values(array_shift(ArrestDB::Query($countQuery, $data)))));
+
 	if (isset($_GET['by']) === true)
 	{
 		if (isset($_GET['order']) !== true)
@@ -76,7 +79,13 @@ ArrestDB::Serve('GET', '/(#any)/(#any)/(#any)', function ($table, $id, $data)
 		$result = ArrestDB::$HTTP[204];
 	}
 
-	return ArrestDB::Reply($result);
+	return ArrestDB::Reply(array(
+		'limit' => isset($_GET['limit']) && $_GET['limit'] >= 0 ? intval($_GET['limit']) : null,
+		'offset' => isset($_GET['offset']) ? intval($_GET['offset']) : 0,
+		'count' => count($result),
+		'total' => $count,
+		'data' => $result,
+	));
 });
 
 ArrestDB::Serve('GET', '/(#any)/(#num)?', function ($table, $id = null)
@@ -109,6 +118,9 @@ ArrestDB::Serve('GET', '/(#any)/(#num)?', function ($table, $id = null)
 				$query[] = sprintf('"%s" %s \'%s\' %s', $column, $operator, $value, $iter->hasNext() ? 'AND' : '');
 			}
 		}
+
+		$countQuery = str_replace('SELECT *', 'SELECT COUNT(*)', sprintf('%s;', implode(' ', $query)));
+		$count = intval(array_shift(array_values(array_shift(ArrestDB::Query($countQuery)))));
 
 		if (isset($_GET['by']) === true)
 		{
@@ -149,7 +161,13 @@ ArrestDB::Serve('GET', '/(#any)/(#num)?', function ($table, $id = null)
 		$result = array_shift($result);
 	}
 
-	return ArrestDB::Reply($result);
+	return ArrestDB::Reply(array(
+		'limit' => isset($_GET['limit']) && $_GET['limit'] >= 0 ? intval($_GET['limit']) : null,
+		'offset' => isset($_GET['offset']) ? intval($_GET['offset']) : 0,
+		'count' => count($result),
+		'total' => $count,
+		'data' => $result,
+	));
 });
 
 ArrestDB::Serve('DELETE', '/(#any)/(#num)', function ($table, $id)
