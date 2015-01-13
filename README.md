@@ -82,6 +82,9 @@ To put this into practice below are some example of how you would use the Arrest
 
 	# Get 50 rows from the "customers" table ordered by the "date" field
 	GET http://api.example.com/customers/?limit=50&by=date&order=desc
+	
+	# Get rows from the "customers" table, where "date_created" is after 2014-08-13 12:15 and "lastname" field equqls Doe
+	GET http://api.example.com/customers/?where[0][col]=date_created&where[0][op]=>=&where[0][val]=2014-08-13 12:15&where[1][col]=lastname&where[1][op]==&where[1][val]=Doe
 
 	# Create a new row in the "customers" table where the POST data corresponds to the database fields
 	POST http://api.example.com/customers/
