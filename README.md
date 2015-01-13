@@ -28,6 +28,8 @@ Edit `index.php` and change the `$dsn` variable located at the top, here are som
 - MySQL: `$dsn = 'mysql://[user[:pass]@]host[:port]/db/;`
 - PostgreSQL: `$dsn = 'pgsql://[user[:pass]@]host[:port]/db/;`
 
+Do not modify directly the `conf.php.dist` file. Instead, make a copy of it named `conf.php`.
+
 If you want to restrict access to allow only specific IP addresses, add them to the `$clients` array:
 
 ```php
