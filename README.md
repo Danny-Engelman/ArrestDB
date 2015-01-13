@@ -123,27 +123,55 @@ Since 1.5.0, it's also possible to atomically `INSERT` a batch of records by POS
 
 ##Responses
 
-All responses are in the JSON format. A `GET` response from the `customers` table might look like this:
+All responses are in the JSON format. A `GET` response from the `customers` table against an identifier (unique result) might look like this:
 
 ```json
-[
-    {
-        "id": "114",
-        "customerName": "Australian Collectors, Co.",
-        "contactLastName": "Ferguson",
-        "contactFirstName": "Peter",
-        "phone": "123456",
-        "addressLine1": "636 St Kilda Road",
-        "addressLine2": "Level 3",
-        "city": "Melbourne",
-        "state": "Victoria",
-        "postalCode": "3004",
-        "country": "Australia",
-        "salesRepEmployeeNumber": "1611",
-        "creditLimit": "117300"
-    },
-    ...
-]
+
+{
+    "id": "114",
+    "customerName": "Australian Collectors, Co.",
+    "contactLastName": "Ferguson",
+    "contactFirstName": "Peter",
+    "phone": "123456",
+    "addressLine1": "636 St Kilda Road",
+    "addressLine2": "Level 3",
+    "city": "Melbourne",
+    "state": "Victoria",
+    "postalCode": "3004",
+    "country": "Australia",
+    "salesRepEmployeeNumber": "1611",
+    "creditLimit": "117300"
+}
+
+```
+
+ `GET` response from the `customers` table might look like this:
+
+```json
+{
+    "limit": 50,
+    "offset": 0,
+    "count": 50,
+    "total": 66,
+    "data": [
+        {
+            "id": "114",
+            "customerName": "Australian Collectors, Co.",
+            "contactLastName": "Ferguson",
+            "contactFirstName": "Peter",
+            "phone": "123456",
+            "addressLine1": "636 St Kilda Road",
+            "addressLine2": "Level 3",
+            "city": "Melbourne",
+            "state": "Victoria",
+            "postalCode": "3004",
+            "country": "Australia",
+            "salesRepEmployeeNumber": "1611",
+            "creditLimit": "117300"
+        },
+        ...
+    ]
+}
 ```
 
 Successful `POST` responses will look like:
