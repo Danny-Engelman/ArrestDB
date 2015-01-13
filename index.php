@@ -97,7 +97,12 @@ ArrestDB::Serve('GET', '/(#any)/(#num)?', function ($table, $id = null)
 			$query[] = 'WHERE';
 			$wheres = $_GET['where'];
 
-			foreach($iter = new CachingIterator(new ArrayIterator($wheres)) as $where) {
+			foreach($iter = new CachingIterator(new ArrayIterator($wheres), CachingIterator::TOSTRING_USE_KEY) as $where) {
+
+				if(count(array_diff(['col', 'op', 'val'], array_keys($where))) !== 0) {
+					error_log('Invalid where filters. All filters must define the following keys: `col`, `op`, `val`');
+					exit(ArrestDB::Reply(ArrestDB::$HTTP[400]));
+				}
 				$column = $where['col'];
 				$operator = $where['op'];
 				$value = $where['val'];
