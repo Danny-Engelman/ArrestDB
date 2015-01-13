@@ -1,7 +1,6 @@
 <?php
 
-$dsn = '';
-$clients = [];
+require_once('conf.php');
 
 /**
 * The MIT License
@@ -94,6 +93,18 @@ ArrestDB::Serve('GET', '/(#any)/(#num)?', function ($table, $id = null)
 
 	else
 	{
+		if(isset($_GET['where'])) {
+			$query[] = 'WHERE';
+			$wheres = $_GET['where'];
+
+			foreach($iter = new CachingIterator(new ArrayIterator($wheres)) as $where) {
+				$column = $where['col'];
+				$operator = $where['op'];
+				$value = $where['val'];
+				$query[] = sprintf('"%s" %s \'%s\' %s', $column, $operator, $value, $iter->hasNext() ? 'AND' : '');
+			}
+		}
+
 		if (isset($_GET['by']) === true)
 		{
 			if (isset($_GET['order']) !== true)
@@ -507,6 +518,7 @@ class ArrestDB
 
 		catch (\Exception $exception)
 		{
+			error_log($exception->getMessage());
 			return false;
 		}
 
