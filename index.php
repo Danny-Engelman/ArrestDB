@@ -71,12 +71,12 @@ ArrestDB::Serve('GET', '/(#any)/(#any)/(#any)', function ($table, $id, $data)
 
 	if ($result === false)
 	{
-		$result = ArrestDB::$HTTP[404];
+		return ArrestDB::Reply(ArrestDB::$HTTP[404]);
 	}
 
 	else if (empty($result) === true)
 	{
-		$result = ArrestDB::$HTTP[204];
+		return ArrestDB::Reply(ArrestDB::$HTTP[204]);
 	}
 
 	return ArrestDB::Reply(array(
@@ -149,17 +149,17 @@ ArrestDB::Serve('GET', '/(#any)/(#num)?', function ($table, $id = null)
 
 	if ($result === false)
 	{
-		$result = ArrestDB::$HTTP[404];
+		return ArrestDB::Reply(ArrestDB::$HTTP[404]);
 	}
 
 	else if (empty($result) === true)
 	{
-		$result = ArrestDB::$HTTP[204];
+		return ArrestDB::Reply(ArrestDB::$HTTP[204]);
 	}
 
 	else if (isset($id) === true)
 	{
-		$result = array_shift($result);
+		return ArrestDB::Reply(array_shift($result));
 	}
 
 	return ArrestDB::Reply(array(
@@ -414,6 +414,7 @@ class ArrestDB
 				}
 
 				$data = array_slice(func_get_args(), 1);
+				if(isset($data[0]) && empty($data[0])) $data = []; //If null or empty array was given as second arg, clear args
 
 				if (count($data, COUNT_RECURSIVE) > count($data))
 				{
