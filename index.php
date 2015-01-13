@@ -90,6 +90,7 @@ ArrestDB::Serve('GET', '/(#any)/(#any)/(#any)', function ($table, $id, $data)
 
 ArrestDB::Serve('GET', '/(#any)/(#num)?', function ($table, $id = null)
 {
+	$data = [];
 	$query = array
 	(
 		sprintf('SELECT * FROM "%s"', $table),
@@ -114,13 +115,13 @@ ArrestDB::Serve('GET', '/(#any)/(#num)?', function ($table, $id = null)
 				}
 				$column = $where['col'];
 				$operator = $where['op'];
-				$value = $where['val'];
-				$query[] = sprintf('"%s" %s \'%s\' %s', $column, $operator, $value, $iter->hasNext() ? 'AND' : '');
+				$data[] = $where['val'];
+				$query[] = sprintf('"%s" %s ? %s', $column, $operator, $iter->hasNext() ? 'AND' : '');
 			}
 		}
 
 		$countQuery = str_replace('SELECT *', 'SELECT COUNT(*)', sprintf('%s;', implode(' ', $query)));
-		$count = intval(array_shift(array_values(array_shift(ArrestDB::Query($countQuery)))));
+		$count = intval(array_shift(array_values(array_shift(ArrestDB::Query($countQuery, $data)))));
 
 		if (isset($_GET['by']) === true)
 		{
@@ -144,7 +145,7 @@ ArrestDB::Serve('GET', '/(#any)/(#num)?', function ($table, $id = null)
 	}
 
 	$query = sprintf('%s;', implode(' ', $query));
-	$result = (isset($id) === true) ? ArrestDB::Query($query, $id) : ArrestDB::Query($query);
+	$result = (isset($id) === true) ? ArrestDB::Query($query, $id) : ArrestDB::Query($query, $data);
 
 	if ($result === false)
 	{
