@@ -90,56 +90,67 @@ ArrestDB::Serve('GET', '/(#any)/(#any)/(#any)', function ($table, $id, $data)
 
 ArrestDB::Serve('GET', '/(#any)/(#num)?', function ($table, $id = null)
 {
+	require_once('queries.php');
+	$query = [];
 	$data = [];
-	$query = array
-	(
-		sprintf('SELECT * FROM "%s"', $table),
-	);
-
-	if (isset($id) === true)
-	{
-		$query[] = sprintf('WHERE "%s" = ? LIMIT 1', 'id');
+	$count = -1;
+	
+	while ($query_name = current($queries)) {
+    		if ($query_name == $table) {
+        		$query[] = sprintf(key($queries));
+    		}
+    		next($queries);
 	}
 
-	else
-	{
-		if(isset($_GET['where'])) {
-			$query[] = 'WHERE';
-			$wheres = $_GET['where'];
+	if (count($query) == 0) {
+		$query[] = sprintf('SELECT * FROM "%s"', $table);
+	
 
-			foreach($iter = new CachingIterator(new ArrayIterator($wheres), CachingIterator::TOSTRING_USE_KEY) as $where) {
+		if (isset($id) === true)
+		{
+			$query[] = sprintf('WHERE "%s" = ? LIMIT 1', 'id');
+		}
 
-				if(count(array_diff(['col', 'op', 'val'], array_keys($where))) !== 0) {
-					error_log('Invalid where filters. All filters must define the following keys: `col`, `op`, `val`');
-					exit(ArrestDB::Reply(ArrestDB::$HTTP[400]));
+		else
+		{
+			if(isset($_GET['where'])) {
+				$query[] = 'WHERE';
+				$wheres = $_GET['where'];
+
+				foreach($iter = new CachingIterator(new ArrayIterator($wheres), CachingIterator::TOSTRING_USE_KEY) as $where) {
+
+					if(count(array_diff(['col', 'op', 'val'], array_keys($where))) !== 0) {
+						error_log('Invalid where filters. All filters must define the following keys: `col`, `op`, `val`');
+						exit(ArrestDB::Reply(ArrestDB::$HTTP[400]));
+					}
+					$column = $where['col'];
+					$operator = $where['op'];
+					$data[] = $where['val'];
+					$query[] = sprintf('"%s" %s ? %s', $column, $operator, $iter->hasNext() ? 'AND' : '');
 				}
-				$column = $where['col'];
-				$operator = $where['op'];
-				$data[] = $where['val'];
-				$query[] = sprintf('"%s" %s ? %s', $column, $operator, $iter->hasNext() ? 'AND' : '');
-			}
-		}
-
-		$countQuery = str_replace('SELECT *', 'SELECT COUNT(*)', sprintf('%s;', implode(' ', $query)));
-		$count = intval(array_shift(array_values(array_shift(ArrestDB::Query($countQuery, $data)))));
-
-		if (isset($_GET['by']) === true)
-		{
-			if (isset($_GET['order']) !== true)
-			{
-				$_GET['order'] = 'ASC';
 			}
 
-			$query[] = sprintf('ORDER BY "%s" %s', $_GET['by'], $_GET['order']);
-		}
+			$countQuery = str_replace('SELECT *', 'SELECT COUNT(*)', sprintf('%s;', implode(' ', $query)));
+			$count = intval(array_shift(array_values(array_shift(ArrestDB::Query($countQuery, $data)))));
 
-		if (isset($_GET['limit']) === true)
-		{
-			$query[] = sprintf('LIMIT %u', $_GET['limit']);
-
-			if (isset($_GET['offset']) === true)
+			if (isset($_GET['by']) === true)
 			{
-				$query[] = sprintf('OFFSET %u', $_GET['offset']);
+				if (isset($_GET['order']) !== true)
+				{
+					$_GET['order'] = 'ASC';
+				}
+
+				$query[] = sprintf('ORDER BY "%s" %s', $_GET['by'], $_GET['order']);
+			}
+
+			if (isset($_GET['limit']) === true)
+			{
+				$query[] = sprintf('LIMIT %u', $_GET['limit']);
+
+				if (isset($_GET['offset']) === true)
+				{
+					$query[] = sprintf('OFFSET %u', $_GET['offset']);
+				}
 			}
 		}
 	}

@@ -54,6 +54,20 @@ If you're using Apache, you can use the following `mod_rewrite` rules in a `.hta
 </IfModule>
 ```
 
+If you're using Microsoft IIS (Internet Information Services) these are the URL Rewrite rules for your web.config 
+file. Requires URL Re-Write Extension [http://www.iis.net/downloads/microsoft/url-rewrite](http://www.iis.net/downloads/microsoft/url-rewrite):
+    
+    <rewrite>
+        <rules>
+            <rule name="Index" stopProcessing="true">
+                <match url="^(.*)$" />
+                <action type="Rewrite" url="index.php/{R:0}" logRewrittenUrl="true" />
+                <conditions>
+                </conditions>
+            </rule>
+        </rules>
+    </rewrite>
+
 ***Nota bene:*** You must access the file directly, including it from another file won't work.
 
 ##API Design
@@ -95,6 +109,9 @@ To put this into practice below are some example of how you would use the Arrest
 	# Delete customer "123" from the "customers" table
 	DELETE http://api.example.com/customers/123/
 
+	# Get all records from a custom query called "customerreport" (Add custom query into array inside queries.php)
+	GET http://api.example.com/customerreport/
+	
 Please note that `GET` calls accept the following query string variables:
 
 - `by` (column to order by)
@@ -236,6 +253,7 @@ Ajax-like requests will be minified, whereas normal browser requests will be hum
 - **1.7.0** ~~fixed PostgreSQL connection bug, other minor improvements~~
 - **1.8.0** ~~fixed POST / PUT bug introduced in 1.5.0~~
 - **1.9.0** ~~updated to PHP 5.4 short array syntax~~
+- **1.9.1** ~~Added support for custom queries and added web.config rewrite example
 
 ##Credits
 
