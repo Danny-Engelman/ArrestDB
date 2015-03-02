@@ -260,8 +260,12 @@ ArrestDB::Serve('POST', '/(#any)', function ($table)
 
 			foreach ($row as $key => $value)
 			{
+				if($key==='clientip'){
+					$value=$_SERVER['REMOTE_ADDR'];
+				}
 				$data[sprintf('"%s"', $key)] = $value;
 			}
+}
 
 			$query = array
 			(
