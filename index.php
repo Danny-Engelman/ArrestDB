@@ -265,7 +265,6 @@ ArrestDB::Serve('POST', '/(#any)', function ($table)
 				}
 				$data[sprintf('"%s"', $key)] = $value;
 			}
-}
 
 			$query = array
 			(
